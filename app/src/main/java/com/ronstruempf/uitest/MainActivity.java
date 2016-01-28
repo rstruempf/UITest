@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
                 };
 
         LinearLayout linLayout=new LinearLayout(this);
+        linLayout.setId(100);
         linLayout.setOrientation(LinearLayout.VERTICAL);
         Button b = new Button(this);
         b.setText("Hello Button");
