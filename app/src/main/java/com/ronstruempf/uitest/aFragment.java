@@ -17,8 +17,12 @@ public class aFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         LinearLayout linLayout=
                 new LinearLayout(getActivity());
+        linLayout.setOrientation(LinearLayout.HORIZONTAL);
         Button b = new Button(getActivity());
-        b.setText("Hello Button");
+        b.setText("Fragment Button 1");
+        linLayout.addView(b);
+        b = new Button(getActivity());
+        b.setText("Fragment Button 2");
         linLayout.addView(b);
 
         return linLayout;

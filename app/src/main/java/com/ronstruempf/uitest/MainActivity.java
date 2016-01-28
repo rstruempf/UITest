@@ -1,5 +1,9 @@
 package com.ronstruempf.uitest;
 
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -17,9 +21,18 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
+
 public class MainActivity extends AppCompatActivity {
 
     private static String APP_TAG = "UITest";
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         //
         // Create a button click listener and programmatically bind this to three new test buttons
         //
-        View.OnClickListener myonClickListener=
+        View.OnClickListener myonClickListener =
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -40,22 +53,42 @@ public class MainActivity extends AppCompatActivity {
                     }
                 };
 
-        LinearLayout linLayout=new LinearLayout(this);
-        //linLayout.setId(100);
+        LinearLayout linLayout = new LinearLayout(this);
+        /*
+         * Layout on main page is vertical stack of fragments, which have two buttons horizontal, so
+         *   we end up with two columns of buttons
+         */
         linLayout.setOrientation(LinearLayout.VERTICAL);
-        Button b = new Button(this);
-        b.setText("Hello Button");
-        b.setOnClickListener(myonClickListener);
-        linLayout.addView(b);
-        b = new Button(this);
-        b.setText("Hello Button 2");
-        b.setOnClickListener(myonClickListener);
-        linLayout.addView(b);
-        b = new Button(this);
-        b.setText("Hello Button 3");
-        b.setOnClickListener(myonClickListener);
-        linLayout.addView(b);
+        // layout needs an id to add fragments to it
+        linLayout.setId(100);
         setContentView(linLayout);
+        /**
+         * Fun with fragments
+         *  Note: Only add fragments on initial create.  If we are being resumed, the system will
+         *     restore the fragments
+         */
+        if (savedInstanceState == null) {
+            // create a fragment and use the fragment manager to add it
+            //  Note: These fragments are not build until after onCreate() exits, so we cannot manipulate
+            //      them here.
+            aFragment frag1 = new aFragment();
+            FragmentManager fm = getFragmentManager();
+            FragmentTransaction ft = fm.beginTransaction();
+            ft.add(100, frag1);
+            ft.commit();
+            /**
+             * Here we use the same fragment manager, but need a new transaction because the previous
+             *   was already committed.  I add multiple fragments in the same transaction this time.
+             */
+            ft = fm.beginTransaction();
+            ft.add(100, new aFragment());
+            ft.add(100, new aFragment());
+            ft.commit();
+        }
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
     @Override
@@ -87,5 +120,45 @@ public class MainActivity extends AppCompatActivity {
         String bText = button.getText().toString();
         int value = Integer.parseInt(bText);
         total += value;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Main Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app deep link URI is correct.
+                Uri.parse("android-app://com.ronstruempf.uitest/http/host/path")
+        );
+        AppIndex.AppIndexApi.start(client, viewAction);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Main Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app deep link URI is correct.
+                Uri.parse("android-app://com.ronstruempf.uitest/http/host/path")
+        );
+        AppIndex.AppIndexApi.end(client, viewAction);
+        client.disconnect();
     }
 }
